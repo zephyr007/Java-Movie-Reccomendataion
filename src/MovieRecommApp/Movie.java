@@ -5,13 +5,14 @@ import java.util.ArrayList;
 public class Movie {
     public int Id;
     public String Name;
-    public String Rdate;
+    public int Rdate;
     public String Vdate;
     public String Link;
     public String GenreStr;
     public ArrayList<Integer> ratings;
+    public int rating=0;
 
-    public Movie(int id,String name, String rdate, String vdate, String link, String genreStr) {
+    public Movie(int id, String name, int rdate, String vdate, String link, String genreStr) {
         Id=id;
         Name = name;
         Rdate = rdate;
@@ -26,7 +27,8 @@ public class Movie {
         for (int i = 0; i < ratings.size(); i++) {
             avg+=ratings.get(i);
         }
-        return avg/ratings.size();
+        rating= (int) (avg/ratings.size());
+        return rating;
     }
 
     public int getId() {
@@ -37,7 +39,7 @@ public class Movie {
         return Name;
     }
 
-    public String getRdate() {
+    public int getRdate() {
         return Rdate;
     }
 

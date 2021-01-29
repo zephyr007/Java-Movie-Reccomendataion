@@ -1,5 +1,7 @@
 package MovieRecommApp;
 
+import javafx.util.Pair;
+
 import java.io.*;
 import java.util.*;
 import java.io.BufferedReader;
@@ -13,6 +15,9 @@ public class index {
     public static int MostRatings=0;
 
     public  static HashMap<Integer,Movie> movieMap =new HashMap<Integer, Movie>();
+//    PriorityQueue<Pair<Integer,Movie>> pq;
+
+
     //change file location
     public  static String fileloc ="./src/test/";
     public static void getMovie(){
@@ -27,8 +32,15 @@ public class index {
                 for (int i = 0; i < 19 && i+5 <split.length ; i++) {
                     gens+=split[i+5];
                 }
+
+                //Getting year out of
+                String[] split2=split[2].split("-");
+                int ryear=0;
+                if(split2.length>=2)
+                    ryear = Integer.parseInt(split2[2]);
+//               System.out.println("year of release of "+split[1]+" "+ryear);
                 Movie movie=new Movie(Integer.parseInt(split[0]),
-                        split[1],split[2],
+                        split[1],ryear,
                         split[3],
                         split[4],
                         gens );
@@ -86,17 +98,52 @@ public class index {
     }
     static int highestRating=0;
     static int highestRatedMovie=0;
+    static HashMap<Integer,ArrayList<Movie>> movieBYYear= new HashMap<>();
 
     static void ratingMovies(){
         for (Map.Entry mapElement: movieMap.entrySet()) {
             int key= (int) mapElement.getKey();
+            Movie movie= movieMap.get(key);
+            int ryear=movie.getRdate();
             double avgRating=movieMap.get(key).AvgRating();
+            int ratingtoput= (int) avgRating;
 
             if(avgRating> highestRating){
                 highestRating= (int) avgRating;
                 highestRatedMovie=key;
             }
 //            System.out.println(key+" "+avgRating);
+            if(movieBYYear.get(ryear)==null){
+//                    PriorityQueue<Pair<Integer,Movie>> pq=new PriorityQueue<>();
+//                Pair<Integer,Movie> moviePair=new Pair<Integer,Movie>(ratingtoput,movie);
+//                PriorityQueue<Pair<Integer,Movie>> pq=new PriorityQueue<Pair<Integer,Movie>>(Collections.singleton(moviePair));
+                ArrayList<Movie> arrayList=new ArrayList<Movie>(Collections.singleton(movie));
+                movieBYYear.put(ryear,arrayList);
+            }
+            else
+            {
+                //if element already exists adding a pair;
+//                Pair<Integer,Movie> pair=new Pair<Integer,Movie>(ratingtoput,movie);
+////                PriorityQueue<Pair<Integer,Movie>> pq= new PriorityQueue<Pair<Integer,Movie>>(Collections.singleton(pair));
+//                PriorityQueue<Pair<Integer,Movie>> pq= movieBYYear.get(ryear); //getting element becoz no pointers
+                //now to add
+//                pq.add(pair);
+                ArrayList<Movie> arrayList=movieBYYear.get(ryear);
+                arrayList.add(movie);
+                movieBYYear.put(ryear,arrayList);
+            }
+        }
+    }
+
+
+    static void sortMoviesByYear(){
+        for (
+                Map.Entry mapEl: movieBYYear.entrySet()
+        ) {
+            int key = (int) mapEl.getKey();
+            ArrayList<Movie> arrayList=movieBYYear.get(key);
+            //Lamda comparison
+            arrayList.sort((Movie a,Movie b)->b.rating-a.rating);
         }
     }
 
@@ -116,9 +163,20 @@ public class index {
         System.out.println("Most Watched Movie: "+movieMap.get(MostWatchedMovie).getName()+" watched "+WatchCounter+" times");
         //Highest Rated Movie
         System.out.println("Highest rated movie: "+movieMap.get(highestRatedMovie).getName()+" rated at "+highestRating);
+        //Highest Rated Movie
 
         //Sorting movies by rating
+//        System.out.println("Size of MovieByYear "+movieBYYear.size());
+        sortMoviesByYear();
+        for (
+                Map.Entry mapEl: movieBYYear.entrySet()
+             ) {
+            int key = (int) mapEl.getKey();
+            Movie top= movieBYYear.get(key).get(movieBYYear.get(key).size()-1);
+            System.out.println("Movie of the year "+key+" : "+top.getName());
+        }
 
         //Recommend movies
+
     }
 }
