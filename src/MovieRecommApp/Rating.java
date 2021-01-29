@@ -3,9 +3,9 @@ package MovieRecommApp;
 public class Rating {
     public int Uid;
     public int Mid;
-    public double Rating;
+    public int Rating;
 
-    public Rating(int uid, int mid, double rating) {
+    public Rating(int uid, int mid, int rating) {
         Uid = uid;
         Mid = mid;
         Rating = rating;
@@ -19,7 +19,7 @@ public class Rating {
         return Mid;
     }
 
-    public double getRating() {
+    public int getRating() {
         return Rating;
     }
 }
