@@ -1,6 +1,7 @@
 package MovieRecommApp;
 
 import javafx.util.Pair;
+import jdk.nashorn.internal.runtime.RecompilableScriptFunctionData;
 
 import java.io.*;
 import java.util.*;
@@ -32,7 +33,7 @@ public class index {
     public  static HashMap<Integer,Movie> movieMap =new HashMap<Integer, Movie>();
     public  static HashMap<Integer,User> userMap= new HashMap<Integer,User>();
 //    PriorityQueue<Pair<Integer,Movie>> pq;
-    static HashMap<String, Vector<Integer>> gensMapping=new HashMap<String, Vector<Integer>>();
+    static HashMap<String, ArrayList<Integer>> gensMapping=new HashMap<String, ArrayList<Integer>>();
 
     //change file location
     public  static String fileloc ="./src/test/";
@@ -68,19 +69,20 @@ public class index {
                 movieMap.put(movie.getId(),movie);
                 if(gensMapping.get(movie.getGenreStr())!=null)
                 {
-                    Vector<Integer> movieVector;
+                    ArrayList<Integer> movieVector= new ArrayList<>();
 
                     //if gens existed or not
-                    if(gensMapping.get(movie.getGenreStr()).size()==0)
-                    {
-                        movieVector=new Vector<Integer>();
-                    }
-                    else
+                    if(gensMapping.get(movie.getGenreStr()).size()!=0)
                     {
                         movieVector=gensMapping.get(movie.getGenreStr());
                     }
                     movieVector.add(movie.getId());
                     gensMapping.put(movie.getGenreStr(),movieVector);
+                }
+                else{
+                    ArrayList<Integer> a1=new ArrayList<Integer>();
+                    a1.add(movie.getId());
+                    gensMapping.put(movie.getGenreStr(),a1);
                 }
             }
 
@@ -268,20 +270,20 @@ public class index {
 
         }
         //getting top 2-3 movies
-        System.out.println("User Top Movies are :");
+//        System.out.println("User Top Movies are :");
         int count=0;
         HashMap<String ,Integer> check=new HashMap<String,Integer>();
-        while (!movieRatingPQ.isEmpty() && count<5){
+        while (!movieRatingPQ.isEmpty()){
             Pair<Integer,Integer> top=movieRatingPQ.peek();
             movieRatingPQ.poll();
 
             int movieId=top.getValue();
             String ss=movieMap.get(movieId).getGenreStr();
-            System.out.println(movieMap.get(movieId).getName());
+//            System.out.println(movieMap.get(movieId).getName());
 
             if(check.get(ss)==null){
                 topMovieString.add(ss);
-                System.out.println(ss);
+//                System.out.println(ss);
             }
             check.put(ss,1);
             count++;
@@ -298,7 +300,8 @@ public class index {
         m3=0;
         m4=0;
         m5=0;
-        System.out.println(topMovieString.size());
+        HashMap<Integer,Integer> moviesAlreadyGiven=new HashMap<Integer,Integer>();
+
             //i have the string now get movie
             for (int i = 0; i < topMovieString.size(); i++) {
 
@@ -306,19 +309,21 @@ public class index {
                  * Error here gens aur movie mapping m vector khaali aa raha h
                  * yeh dekho line 76
                  * ***/
-
-                Vector<Integer> movieEl=gensMapping.get(topMovieString.get(idx));
+                if(gensMapping.get(topMovieString.get(idx))==null)
+                    continue;
+                ArrayList<Integer> movieEl=gensMapping.get(topMovieString.get(idx));
                 if(movieEl==null)
                     continue;
-                System.out.println(movieMap.get(movieEl).getName());
                 for (int j = 0; j < movieEl.size(); j++) {
                     int currId=movieEl.get(j);
 
                     if(user1.watchedMovies.get(currId)!=null)
                         continue;
+                    if(moviesAlreadyGiven.get(currId)!=null)
+                        continue;
+                    moviesAlreadyGiven.put(currId,1);
 
                     int currRating=movieMap.get(currId).rating;
-
                     //PQ ki implementation
                     if(currRating>m1)
                     {
@@ -372,9 +377,10 @@ public class index {
                 }
             }
 
+        System.out.println("\n Movie Recommended for User id " + id);
         for (int i = 0; i < response.length; i++) {
             if(movieMap.get(response[i])!=null)
-            System.out.println("Movie Recommended for User "+i+" th "+ movieMap.get(response[i]).getName());
+            System.out.println(" :: "+ movieMap.get(response[i]).getName());
         }
     }
 
@@ -437,7 +443,7 @@ public class index {
             }
         }
 
-//        HashMap<String,PriorityQueue<Movie>> pq;
+
         //Recommend movies
 
         int user_id=405;
