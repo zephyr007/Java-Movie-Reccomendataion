@@ -252,7 +252,8 @@ public class index {
         User user1=userMap.get(id);
 
         ArrayList<String> topMovieString=new ArrayList<String>();
-
+        PriorityQueue<Pair<Integer,Integer>> movieRatingPQ;
+        movieRatingPQ= new PriorityQueue<>(Comparator.comparingInt(Pair::getKey));
         //Using Avg rating instead of Personal Rating for now
         //if everyone liked it maybe he even liked it
         for (
@@ -260,13 +261,16 @@ public class index {
              ) {
             int movieId= (int) mapEl.getKey();
             int movieRating= movieMap.get(movieId).rating;
+
             Pair<Integer,Integer> movie=new Pair<Integer,Integer>(movieRating,movieId);
-            userMap.get(id).movieRatingPQ.add(movie);
+            //pair are pushed in the tack to get users fav movies
+            movieRatingPQ.add(movie);
+
         }
         //getting top 2-3 movies
-        while (!user1.movieRatingPQ.isEmpty()){
-            Pair<Integer,Integer> top=user1.movieRatingPQ.peek();
-            user1.movieRatingPQ.poll();
+        while (!movieRatingPQ.isEmpty()){
+            Pair<Integer,Integer> top=movieRatingPQ.peek();
+            movieRatingPQ.poll();
 
             int movieId=top.getValue();
             topMovieString.add(movieMap.get(movieId).getGenreStr());
@@ -290,6 +294,8 @@ public class index {
             //i have the string now get movie
             for (int i = 0; i < topMovieString.size(); i++) {
                 Vector<Integer> movieEl=gensMapping.get(topMovieString.get(idx));
+                if(movieEl==null)
+                    continue;
                 for (int j = 0; j < movieEl.size(); j++) {
                     int currId=movieEl.get(j);
 
@@ -419,7 +425,7 @@ public class index {
 //        HashMap<String,PriorityQueue<Movie>> pq;
         //Recommend movies
 
-        int user_id=222;
+        int user_id=405;
         suggestMovie(user_id);
 
     }

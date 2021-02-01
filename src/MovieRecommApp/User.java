@@ -11,7 +11,7 @@ public class User {
     public String gender;
     public String occ;
     public String zip;
-    public PriorityQueue<Pair<Integer,Integer>> movieRatingPQ;
+//    public PriorityQueue<Pair<Integer,Integer>> movieRatingPQ;
     public HashMap<Integer,Integer> watchedMovies;
 
     public User(int id, int age, String gender, String occ, String zip) {
@@ -21,7 +21,7 @@ public class User {
         this.occ = occ;
         this.zip = zip;
 
-        movieRatingPQ= new PriorityQueue<>();
+
         watchedMovies= new HashMap<Integer, Integer>();
     }
 
