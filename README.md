@@ -1,4 +1,7 @@
 # Java-Movie-Reccomendataion
+
+#Run src/MovieRecomendAPP/index.java
+
 #Problem Statement :
 ============ 
 #Given a user id, recommend 5 movies for that user. You should recommend a movie which the user has the highest probability of liking. You must not recommend a movie the user has already seen. Current data set is for 100K ratings. Final data set would be for 1M ratings. So make sure your solution can scale.
