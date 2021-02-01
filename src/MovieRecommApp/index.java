@@ -268,15 +268,24 @@ public class index {
 
         }
         //getting top 2-3 movies
-        while (!movieRatingPQ.isEmpty()){
+        System.out.println("User Top Movies are :");
+        int count=0;
+        HashMap<String ,Integer> check=new HashMap<String,Integer>();
+        while (!movieRatingPQ.isEmpty() && count<5){
             Pair<Integer,Integer> top=movieRatingPQ.peek();
             movieRatingPQ.poll();
 
             int movieId=top.getValue();
-            topMovieString.add(movieMap.get(movieId).getGenreStr());
-        }
+            String ss=movieMap.get(movieId).getGenreStr();
+            System.out.println(movieMap.get(movieId).getName());
 
-        int count=0;
+            if(check.get(ss)==null){
+                topMovieString.add(ss);
+                System.out.println(ss);
+            }
+            check.put(ss,1);
+            count++;
+        }
         int idx=0;
 
         int[] response=new int[5];
@@ -289,13 +298,19 @@ public class index {
         m3=0;
         m4=0;
         m5=0;
-
-        while (count<=5){
+        System.out.println(topMovieString.size());
             //i have the string now get movie
             for (int i = 0; i < topMovieString.size(); i++) {
+
+                /***
+                 * Error here gens aur movie mapping m vector khaali aa raha h
+                 * yeh dekho line 76
+                 * ***/
+
                 Vector<Integer> movieEl=gensMapping.get(topMovieString.get(idx));
                 if(movieEl==null)
                     continue;
+                System.out.println(movieMap.get(movieEl).getName());
                 for (int j = 0; j < movieEl.size(); j++) {
                     int currId=movieEl.get(j);
 
@@ -356,9 +371,9 @@ public class index {
                     }
                 }
             }
-        }
 
         for (int i = 0; i < response.length; i++) {
+            if(movieMap.get(response[i])!=null)
             System.out.println("Movie Recommended for User "+i+" th "+ movieMap.get(response[i]).getName());
         }
     }
