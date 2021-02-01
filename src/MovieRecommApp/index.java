@@ -10,6 +10,10 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class index {
+
+    //change file location
+    public  static String fileloc ="./src/test/";
+
     public static int MostActiveUser=0;
     static int MostWatchedMovie=0;
     static int WatchCounter=0;
@@ -35,8 +39,7 @@ public class index {
 //    PriorityQueue<Pair<Integer,Movie>> pq;
     static HashMap<String, ArrayList<Integer>> gensMapping=new HashMap<String, ArrayList<Integer>>();
 
-    //change file location
-    public  static String fileloc ="./src/test/";
+
     public static void getMovie(){
         try (BufferedReader br = new BufferedReader(new FileReader(fileloc+"movie1.data"))) {
 
@@ -396,21 +399,7 @@ public class index {
         }
     }
 
-    public static void main(String[] args) {
-
-        //Read Files
-        getMovie();
-        genreYearHelperFiller();
-        System.out.println("Movie indexed at 89: "+ movieMap.get(89).getName());
-        getUser();
-        getRating();
-
-        ratingMovies();
-
-        mapGenre();
-
-        
-
+    static void WarmUp(){
         //WarmUp Problem : MostActive User
         System.out.println("Most Active User: "+MostActiveUser+" Rated: " +ratingMap.get(MostActiveUser)+ " movies");
         //WarmUp Problem : MostWatched Movie
@@ -423,7 +412,7 @@ public class index {
         sortMoviesByYear();
         for (
                 Map.Entry mapEl: movieBYYear.entrySet()
-             ) {
+        ) {
             int key = (int) mapEl.getKey();
             if(key==0)
                 continue;
@@ -442,10 +431,25 @@ public class index {
                     System.out.println("Highest Rated Movies by year:"+j+" : genre :"+genreMap2.get(i)+" :: "+movieMap.get(genreYearHelper[i][j]).getName());
             }
         }
+    }
 
+    public static void main(String[] args) {
 
-        //Recommend movies
+        //Read Files
+        getMovie();
+        genreYearHelperFiller();
+        System.out.println("Movie indexed at 89: "+ movieMap.get(89).getName());
+        getUser();
+        getRating();
 
+        ratingMovies();
+
+        mapGenre();
+
+        //Warm up Problems
+        WarmUp();
+
+        //Reccomend Movies
         int user_id=405;
         suggestMovie(user_id);
 
