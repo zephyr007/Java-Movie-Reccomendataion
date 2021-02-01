@@ -30,8 +30,9 @@ public class index {
     static int[][] genreYearHelper =new int[19][3000];
 
     public  static HashMap<Integer,Movie> movieMap =new HashMap<Integer, Movie>();
+    public  static HashMap<Integer,User> userMap= new HashMap<Integer,User>();
 //    PriorityQueue<Pair<Integer,Movie>> pq;
-
+    static HashMap<String, Vector<Integer>> gensMapping=new HashMap<String, Vector<Integer>>();
 
     //change file location
     public  static String fileloc ="./src/test/";
@@ -65,6 +66,22 @@ public class index {
                         gens );
 //                System.out.println("Movie Added to Db "+movie.getId()+", Title: "+movie.getName()+", GenreString: "+movie.getGenreStr() +", year: "+ movie.getRdate());
                 movieMap.put(movie.getId(),movie);
+                if(gensMapping.get(movie.getGenreStr())!=null)
+                {
+                    Vector<Integer> movieVector;
+
+                    //if gens existed or not
+                    if(gensMapping.get(movie.getGenreStr()).size()==0)
+                    {
+                        movieVector=new Vector<Integer>();
+                    }
+                    else
+                    {
+                        movieVector=gensMapping.get(movie.getGenreStr());
+                    }
+                    movieVector.add(movie.getId());
+                    gensMapping.put(movie.getGenreStr(),movieVector);
+                }
             }
 
         } catch (IOException e) {
@@ -72,7 +89,26 @@ public class index {
         }
     }
 
+    public static void getUser(){
+        try(BufferedReader Br=new BufferedReader(new FileReader(fileloc+"user.data"))){
+            String data;
+            while ((data= Br.readLine())!=null){
+                String[] split=data.split("\\|");
 
+                User user=new User(Integer.parseInt(split[0]),
+                        Integer.parseInt(split[1]),
+                        split[2],
+                        split[3],
+                        split[4]);
+
+                userMap.put(user.Id, user);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void getRating(){
         try(BufferedReader Br= new BufferedReader(new FileReader(fileloc+"ratings.data"))) {
@@ -104,6 +140,11 @@ public class index {
                         WatchCounter=movieMap.get(rating.getMid()).ratings.size();
                         MostWatchedMovie=rating.getMid();
                     }
+                }
+
+                if(userMap.get(rating.getUid())!=null)
+                {
+                    userMap.get(rating.getUid()).watchedMovies.put(rating.getMid(),1);
                 }
 
             }
@@ -207,14 +248,138 @@ public class index {
         }
     }
 
+    static void getTopMovies(int id){
+        User user1=userMap.get(id);
+
+        ArrayList<String> topMovieString=new ArrayList<String>();
+
+        //Using Avg rating instead of Personal Rating for now
+        //if everyone liked it maybe he even liked it
+        for (
+                Map.Entry mapEl: user1.watchedMovies.entrySet()
+             ) {
+            int movieId= (int) mapEl.getKey();
+            int movieRating= movieMap.get(movieId).rating;
+            Pair<Integer,Integer> movie=new Pair<Integer,Integer>(movieRating,movieId);
+            userMap.get(id).movieRatingPQ.add(movie);
+        }
+        //getting top 2-3 movies
+        while (!user1.movieRatingPQ.isEmpty()){
+            Pair<Integer,Integer> top=user1.movieRatingPQ.peek();
+            user1.movieRatingPQ.poll();
+
+            int movieId=top.getValue();
+            topMovieString.add(movieMap.get(movieId).getGenreStr());
+        }
+
+        int count=0;
+        int idx=0;
+
+        int[] response=new int[5];
+        for (int i = 0; i < 5; i++) {
+            response[i]=0;
+        }
+        int m1,m2,m3,m4,m5;
+        m1=0;
+        m2=0;
+        m3=0;
+        m4=0;
+        m5=0;
+
+        while (count<=5){
+            //i have the string now get movie
+            for (int i = 0; i < topMovieString.size(); i++) {
+                Vector<Integer> movieEl=gensMapping.get(topMovieString.get(idx));
+                for (int j = 0; j < movieEl.size(); j++) {
+                    int currId=movieEl.get(j);
+
+                    if(user1.watchedMovies.get(currId)!=null)
+                        continue;
+
+                    int currRating=movieMap.get(currId).rating;
+
+                    //PQ ki implementation
+                    if(currRating>m1)
+                    {
+                        m5=m4;
+                        m4=m3;
+                        m3=m2;
+                        m2=m1;
+                        m1=currRating;
+
+                        response[4]=response[3];
+                        response[3]=response[2];
+                        response[2]=response[1];
+                        response[1]=response[0];
+                        response[0]=currId;
+                    }
+                    else if(currRating>m2)
+                    {
+                        m5=m4;
+                        m4=m3;
+                        m3=m2;
+                        m2=currRating;
+
+                        response[4]=response[3];
+                        response[3]=response[2];
+                        response[2]=response[1];
+                        response[1]=currId;
+                    }
+                    else if(currRating>m3){
+                        m5=m4;
+                        m4=m3;
+                        m3=currRating;
+
+
+                        response[4]=response[3];
+                        response[3]=response[2];
+                        response[2]=currId;
+                    }
+                    else if(currRating>m4){
+                        m5=m4;
+                        m4=currRating;
+
+
+                        response[4]=response[3];
+                        response[3]=currId;
+                    }
+                    else if(currRating>m5)
+                    {
+                        m5=currRating;
+                        response[4]=currId;
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < response.length; i++) {
+            System.out.println("Movie Recommended for User "+i+" th "+ movieMap.get(response[i]).getName());
+        }
+    }
+
+    static void suggestMovie(int id)
+    {
+        if(userMap.get(id)!=null){
+            //get users top movies
+            getTopMovies(id);
+        }
+        else
+        {
+            System.out.println("User doesn`t exist`s");
+        }
+    }
+
     public static void main(String[] args) {
 
         //Read Files
         getMovie();
         genreYearHelperFiller();
         System.out.println("Movie indexed at 89: "+ movieMap.get(89).getName());
+        getUser();
         getRating();
+
         ratingMovies();
+
         mapGenre();
 
         
@@ -247,12 +412,15 @@ public class index {
             for(int i=0;i<19;i++)
             {
                 if(genreYearHelper[i][j]!=0)
-                    System.out.println("Highest Rated Movies by year:"+j+" :: genre :"+genreMap2.get(i)+" is "+movieMap.get(genreYearHelper[i][j]).getName());
+                    System.out.println("Highest Rated Movies by year:"+j+" : genre :"+genreMap2.get(i)+" :: "+movieMap.get(genreYearHelper[i][j]).getName());
             }
         }
 
 //        HashMap<String,PriorityQueue<Movie>> pq;
         //Recommend movies
+
+        int user_id=222;
+        suggestMovie(user_id);
 
     }
 }

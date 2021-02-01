@@ -1,18 +1,28 @@
 package MovieRecommApp;
 
+import javafx.util.Pair;
+
+import java.util.HashMap;
+import java.util.PriorityQueue;
+
 public class User {
     public int Id;
     public int age;
-    public char gender;
+    public String gender;
     public String occ;
-    public double zip;
+    public String zip;
+    public PriorityQueue<Pair<Integer,Integer>> movieRatingPQ;
+    public HashMap<Integer,Integer> watchedMovies;
 
-    public User(int id, int age, char gender, String occ, double zip) {
+    public User(int id, int age, String gender, String occ, String zip) {
         Id = id;
         this.age = age;
         this.gender = gender;
         this.occ = occ;
         this.zip = zip;
+
+        movieRatingPQ= new PriorityQueue<>();
+        watchedMovies= new HashMap<Integer, Integer>();
     }
 
     public int getId() {
@@ -23,7 +33,7 @@ public class User {
         return age;
     }
 
-    public char getGender() {
+    public String getGender() {
         return gender;
     }
 
@@ -31,7 +41,7 @@ public class User {
         return occ;
     }
 
-    public double getZip() {
+    public String getZip() {
         return zip;
     }
 }
