@@ -308,10 +308,6 @@ public class index {
             //i have the string now get movie
             for (int i = 0; i < topMovieString.size(); i++) {
 
-                /***
-                 * Error here gens aur movie mapping m vector khaali aa raha h
-                 * yeh dekho line 76
-                 * ***/
                 if(gensMapping.get(topMovieString.get(idx))==null)
                     continue;
                 ArrayList<Integer> movieEl=gensMapping.get(topMovieString.get(idx));
@@ -442,15 +438,16 @@ public class index {
         getUser();
         getRating();
 
+        //get avg ratings,gets (best in genre,year and genre)
         ratingMovies();
 
         mapGenre();
 
-        //Warm up Problems
+        //Warm up Problems : separate function for by year
         WarmUp();
 
-        //Reccomend Movies
-        int user_id=405;
+        //Recommends Movies
+        int user_id=253;
         suggestMovie(user_id);
 
     }
